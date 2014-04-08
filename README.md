@@ -1,22 +1,13 @@
-Pebble Watchface: Silly Walk
+Pebble Watchface: Silly Walk 2.0
 =================
 
-Custom Pebble watch face. Inspired by Monty Python's "Ministry of Silly Walks".
+My Pebble 2.0 port of dansl's original "Pebble Watchface: Silly Walk". Inspired by Monty Python's "Ministry of Silly Walks".
 
-Can also be found on [My Pebble Faces](http://www.mypebblefaces.com/?auID=743&aName=dansl&pageTitle=Faces%20by%20dansl)
+Original can be found on [dansl's GitHub](https://github.com/dansl/pebble-silly-walk)
 
-[Download Watchface: Numbers](https://github.com/dansl/pebble-silly-walk/blob/master/silly_walk/silly_walk.pbw?raw=true)
+Look for this version with JS settings on Pebble AppStore, or download it [here](/pebble_silly_walk_2_0.pbw).
 
-![Numbers](/reference.png)
-
-[Download Watchface: Numbers w/o Seconds](https://github.com/dansl/pebble-silly-walk/blob/master/silly_walk_no_seconds/silly_walk_no_seconds.pbw?raw=true)
-
-![Numbers](/reference3.png)
-
-[Download Watchface: Simple](https://github.com/dansl/pebble-silly-walk/blob/master/silly_walk_simple/silly_walk_simple.pbw?raw=true)
-
-![Simple](/reference2.png)
-
-[Download Watchface: Simple w/o Seconds](https://github.com/dansl/pebble-silly-walk/blob/master/silly_walk_simple_no_seconds/silly_walk_simple_no_seconds.pbw?raw=true)
-
-![Simple](/reference4.png)
+(/reference.png)
+(/reference3.png)
+(/reference2.png)
+(/reference4.png)
