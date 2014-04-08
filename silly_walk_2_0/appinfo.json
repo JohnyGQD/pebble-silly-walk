@@ -1,0 +1,54 @@
+{
+    "versionLabel": "2.0",
+    "uuid": "6b99cc81-47e3-4e48-a2ae-16c52cc32789",
+    "appKeys": {
+        "action": 0,
+        "seconds": 1,
+        "background": 2
+    },
+    "longName": "Silly Walk 2.0",
+    "versionCode": 2,
+    "capabilities": [
+        "configurable"
+    ],
+    "shortName": "Silly Walk",
+    "companyName": "Jan Gruncl (original by Dansl)",
+    "watchapp": {
+        "watchface": true
+    },
+    "resources": {
+        "media": [
+            {
+                "type": "png",
+                "name": "IMAGE_BACKGROUND_SIMPLE",
+                "file": "images/background_simple.png"
+            },
+            {
+                "type": "png-trans",
+                "name": "IMAGE_MINUTE_HAND",
+                "file": "images/minute_hand.png"
+            },
+            {
+                "type": "png-trans",
+                "name": "IMAGE_HOUR_HAND",
+                "file": "images/hour_hand.png"
+            },
+            {
+                "type": "png-trans",
+                "name": "IMAGE_SECOND_HAND",
+                "file": "images/seconds_hand.png"
+            },
+            {
+                "menuIcon": true,
+                "type": "png",
+                "name": "IMAGE_MENU_ICON",
+                "file": "images/icon.png"
+            },
+            {
+                "type": "png",
+                "name": "IMAGE_BACKGROUND",
+                "file": "images/background.png"
+            }
+        ]
+    }
+}
