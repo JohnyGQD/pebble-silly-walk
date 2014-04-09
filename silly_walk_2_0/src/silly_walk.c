@@ -3,14 +3,19 @@
 static Window *window;
 
 static BitmapLayer *background_layer;
+static Layer *info_container, *info_layer;
+static TextLayer *bluetooth_layer, *battery_layer, *day_layer, *date_layer;
 static RotBitmapLayer *black_hour_layer, *white_hour_layer, *black_minute_layer, *white_minute_layer, *black_second_layer, *white_second_layer;
+
+static char date_text[] = "Xxxxxxxxxxxxxxxxxxxxxxx 00", day_text[] = "Xxxxxxxxxxxxxxxxxxxxxxx 00", battery_text[] = "Xxxxxxxxxxxxxxxxxxxxxxx 00";
 
 static GBitmap *background_bitmap, *background_simple_bitmap;
 static GBitmap *black_hour_bitmap, *white_hour_bitmap, *black_minute_bitmap, *white_minute_bitmap, *black_second_bitmap, *white_second_bitmap;
 
-enum Settings { setting_seconds = 1, setting_background };
+enum Settings { setting_seconds = 1, setting_background, setting_info };
 static enum SettingSeconds { seconds_on = 0, seconds_off } seconds;
 static enum SettingBackground { background_rich = 0, background_simple } background;
+static enum SettingInfo { info_on = 0, info_off } info;
 static AppSync app;
 static uint8_t buffer[256];
 
@@ -56,6 +61,31 @@ void update_time(struct tm* t) {
   rot_bitmap_layer_set_angle(black_second_layer, second_angle);
   layer_set_frame((Layer*) black_second_layer, second_frame);
 	layer_mark_dirty((Layer*) black_second_layer);
+  
+  // Update info layer
+  if (info == info_on) {    
+    if (bluetooth_connection_service_peek())
+      text_layer_set_text(bluetooth_layer, "Linked");
+    else      
+      text_layer_set_text(bluetooth_layer, "Offline");
+    
+    BatteryChargeState initial = battery_state_service_peek();
+    bool battery_plugged = initial.is_plugged;
+    uint8_t battery_level = initial.charge_percent;
+    
+    if (battery_plugged)
+	    snprintf(battery_text, sizeof(battery_text), "! %d%%", battery_level);
+    else 
+	    snprintf(battery_text, sizeof(battery_text), "%d%%", battery_level);
+      
+    text_layer_set_text(battery_layer, battery_text);
+    
+    strftime(day_text, sizeof(day_text), "%a", t);
+    text_layer_set_text(day_layer, day_text);
+    
+    strftime(date_text, sizeof(date_text), "%b %e", t);
+    text_layer_set_text(date_layer, date_text);
+  }
 }
 
 void handle_tick(struct tm *tick_time, TimeUnits units_changed) {  
@@ -87,6 +117,16 @@ void disable_seconds() {
   tick_timer_service_subscribe(MINUTE_UNIT, &handle_tick);
 }
 
+void enable_info() {
+  layer_add_child(info_container, info_layer);  
+	layer_mark_dirty(info_container);
+}
+
+void disable_info() {
+  layer_remove_from_parent(info_layer);  
+	layer_mark_dirty(info_container);
+}
+
 static void tuple_changed_callback(const uint32_t key, const Tuple* tuple_new, const Tuple* tuple_old, void* context) {
   int value = tuple_new->value->uint8;
   switch (key) {
@@ -106,6 +146,15 @@ static void tuple_changed_callback(const uint32_t key, const Tuple* tuple_new, c
       bitmap_layer_set_bitmap(background_layer, (background == background_simple) ? background_simple_bitmap : background_bitmap);
       layer_mark_dirty((Layer*) background_layer);
       break;
+    case setting_info:
+      info = value;
+      persist_write_int(setting_info, info);
+      
+      if (info == info_on)
+        enable_info();
+      else
+        disable_info();
+      break;
   }
 }
 
@@ -124,11 +173,13 @@ void init(void) {
   // Set defaults
   seconds = persist_read_int(setting_seconds);
   background = persist_read_int(setting_background);
+  info = persist_read_int(setting_info);
   
   // Load settings 
   Tuplet tuples[] = {
     TupletInteger(setting_seconds, seconds),
-    TupletInteger(setting_background, background)
+    TupletInteger(setting_background, background),
+    TupletInteger(setting_info, info)
   };
   app_message_open(160, 160);
   app_sync_init(&app, buffer, sizeof(buffer), tuples, ARRAY_LENGTH(tuples),
@@ -140,6 +191,45 @@ void init(void) {
   background_layer = bitmap_layer_create(window_bounds);
   bitmap_layer_set_bitmap(background_layer, (background == background_simple) ? background_simple_bitmap : background_bitmap);
   layer_add_child(window_layer, bitmap_layer_get_layer(background_layer));
+  
+  // Init info
+  info_container = layer_create(window_bounds);  
+  layer_add_child(window_layer, info_container);
+  
+  info_layer = layer_create(window_bounds);
+  
+  bluetooth_layer = text_layer_create((GRect) { .origin = { 0, 0 }, .size = { 44, 18 } });
+  text_layer_set_font(bluetooth_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  text_layer_set_text_alignment(bluetooth_layer, GTextAlignmentCenter);
+  text_layer_set_background_color(bluetooth_layer, GColorBlack);
+  text_layer_set_text_color(bluetooth_layer, GColorWhite);
+  layer_add_child(info_layer, text_layer_get_layer(bluetooth_layer));
+  
+  battery_layer = text_layer_create((GRect) { .origin = { 100, 0 }, .size = { 44, 18 } });
+  text_layer_set_font(battery_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  text_layer_set_text_alignment(battery_layer, GTextAlignmentCenter);
+  text_layer_set_background_color(battery_layer, GColorBlack);
+  text_layer_set_text_color(battery_layer, GColorWhite);
+  layer_add_child(info_layer, text_layer_get_layer(battery_layer));
+  
+  day_layer = text_layer_create((GRect) { .origin = { 0, 150 }, .size = { 44, 18 } });
+  text_layer_set_font(day_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  text_layer_set_text_alignment(day_layer, GTextAlignmentCenter);
+  text_layer_set_background_color(day_layer, GColorBlack);
+  text_layer_set_text_color(day_layer, GColorWhite);
+  layer_add_child(info_layer, text_layer_get_layer(day_layer)); 
+  
+  date_layer = text_layer_create((GRect) { .origin = { 100, 150 }, .size = { 44, 18 } });
+  text_layer_set_font(date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  text_layer_set_text_alignment(date_layer, GTextAlignmentCenter);
+  text_layer_set_background_color(date_layer, GColorBlack);
+  text_layer_set_text_color(date_layer, GColorWhite);
+  layer_add_child(info_layer, text_layer_get_layer(date_layer));  
+  
+  if (info == info_on)
+    enable_info();
+  else
+    disable_info();
   
   // Init hour hand
   white_hour_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_HOUR_HAND_WHITE);

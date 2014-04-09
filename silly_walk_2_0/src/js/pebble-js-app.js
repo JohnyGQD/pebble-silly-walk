@@ -1,4 +1,4 @@
-var setPebbleToken = 'MDYH';
+var setPebbleToken = '8QNS';
 
 Pebble.addEventListener('ready', function(e) {
 });
