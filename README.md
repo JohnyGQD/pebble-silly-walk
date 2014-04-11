@@ -5,7 +5,9 @@ My Pebble 2.0 port (+ further development) of dansl's original "Pebble Watchface
 
 Original can be found on [dansl's GitHub](https://github.com/dansl/pebble-silly-walk)
 
-Look for this version with JS settings on Pebble AppStore, or download it [here](/pebble_silly_walk_2_1.pbw).
+Look for this version with JS settings on Pebble AppStore, or download it [here](/pebble_silly_walk_2_2.pbw).
+
+![Rich + Seconds + Info + Digital](/reference7.png)
 
 ![Rich + Seconds + Info](/reference5.png)
 

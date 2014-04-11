@@ -1,14 +1,15 @@
 {
-    "versionLabel": "2.1",
+    "versionLabel": "2.2",
     "uuid": "6b99cc81-47e3-4e48-a2ae-16c52cc32789",
     "appKeys": {
         "action": 0,
         "seconds": 1,
         "info": 3,
-        "background": 2
+        "background": 2,
+        "digital": 4
     },
     "longName": "Silly Walk 2",
-    "versionCode": 21,
+    "versionCode": 22,
     "capabilities": [
         "configurable"
     ],
