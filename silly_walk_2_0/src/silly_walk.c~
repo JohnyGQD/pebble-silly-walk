@@ -164,6 +164,8 @@ void disable_info() {
 void enable_digital() {
   layer_add_child(digital_container, text_layer_get_layer(digital_layer));  
 	layer_mark_dirty(digital_container);
+  
+  update_now();
 }
 
 void disable_digital() {
@@ -209,8 +211,6 @@ static void tuple_changed_callback(const uint32_t key, const Tuple* tuple_new, c
         enable_digital();
       break;
   }
-    
-  update_now();
 }
 
 static void app_error_callback(DictionaryResult dict_error, AppMessageResult app_message_error, void* context) {
@@ -228,7 +228,7 @@ void init(void) {
   last_hour = -1;
   last_minute = -1;
   
-  // Get local values and set them as a defaults
+  // Get local values before the JS is ready to prevent flickering
   seconds = persist_read_int(setting_seconds);
   background = persist_read_int(setting_background);
   info = persist_read_int(setting_info);
@@ -351,12 +351,13 @@ void init(void) {
     disable_seconds();
 }
 
-void deinit(void) {    
+void deinit(void) {
   app_sync_deinit(&app);
   
   tick_timer_service_unsubscribe();
   
-  gbitmap_destroy(background_bitmap);  
+  gbitmap_destroy(background_bitmap);
+  
   gbitmap_destroy(black_hour_bitmap);
   gbitmap_destroy(white_hour_bitmap);
   gbitmap_destroy(black_minute_bitmap);
@@ -380,7 +381,8 @@ void deinit(void) {
   text_layer_destroy(bluetooth_layer);
   text_layer_destroy(battery_layer);
   text_layer_destroy(day_layer);
-  text_layer_destroy(date_layer);  
+  text_layer_destroy(date_layer);
+  
   text_layer_destroy(digital_layer);
                    
   window_destroy(window);
